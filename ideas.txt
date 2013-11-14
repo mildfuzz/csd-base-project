@@ -1,0 +1,9 @@
+// dev-N3wW0rld
+// api-key: 6xhrd8ywewetwdtsxeexkc7h
+
+Second Screen.
+  - Dispatches - background information regarding key concepts covered in show. Secondary use is to promote app during broadcast
+
+
+Food shows - Broken down recipe clips, with automatic pausing during segments encouraging cook along and use on tablet devices
+
