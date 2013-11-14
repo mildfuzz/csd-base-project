@@ -2,12 +2,13 @@ requirejs.config({
     waitSeconds: 0,
     shim: {
         'libs/backbone':{
+            deps: ['libs/underscore'],
             exports: 'Backbone'
         },
         'libs/jquery': {
             exports: '$'
         },
-        'libs/underscore': {
+        'libs/underscore':{
             exports: '_'
         }
     }
