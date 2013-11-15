@@ -16,5 +16,8 @@ requirejs.config({
 
 require(['app'],function(App){
     //initialise application
+    
+
     App.init();
+    App.startSpeech();
 });

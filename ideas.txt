@@ -5,5 +5,14 @@ Second Screen.
   - Dispatches - background information regarding key concepts covered in show. Secondary use is to promote app during broadcast
 
 
-Food shows - Broken down recipe clips, with automatic pausing during segments encouraging cook along and use on tablet devices
+Food shows 	- Broken down recipe clips, with automatic pausing during segments encouraging cook along and use on tablet devices
+			- Clips to have a soundcloud like comment stream for users to add their own clips
+			- Users sign in with facebook
+		*	- Users can flag where they have found hard to find ingredients
+
+
+Soundtracks - A spotify app that contains tracks uses in brand shows, sorted by episode
+
+
+
 
