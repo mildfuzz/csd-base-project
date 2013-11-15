@@ -3,100 +3,100 @@
  */
 define(['libs/underscore','libs/jquery'],function(_, $){
 
-Speech = (function (undefined) {
+var Speech = (function (undefined) {
 
     // https://github.com/aralejs/events ======================================
 
     var eventSplitter = /\s+/,
-        Events = function () {}
+        Events = function () {};
 
     Events.prototype.on = function (events, callback, context) {
-        var cache, event, list
-        if (!callback) return this
+        var cache, event, list;
+        if (!callback) {return this;}
 
-        cache = this.__events || (this.__events = {})
-        events = events.split(eventSplitter)
+        cache = this.__events || (this.__events = {});
+        events = events.split(eventSplitter);
 
         while (event = events.shift()) {
-            list = cache[event] || (cache[event] = [])
-            list.push(callback, context)
+            list = cache[event] || (cache[event] = []);
+            list.push(callback, context);
         }
 
-        return this
-    }
+        return this;
+    };
 
     Events.prototype.off = function (events, callback, context) {
-        var cache, event, list, i
+        var cache, event, list, i;
 
-        if (!(cache = this.__events)) return this
+        if (!(cache = this.__events)) {return this;}
         if (!(events || callback || context)) {
-            delete this.__events
-            return this
+            delete this.__events;
+            return this;
         }
 
-        events = events ? events.split(eventSplitter) : Object.keys(cache)
+        events = events ? events.split(eventSplitter) : Object.keys(cache);
 
         while (event = events.shift()) {
-            list = cache[event]
-            if (!list) continue
+            list = cache[event];
+            if (!list) {continue;}
 
             if (!(callback || context)) {
-                delete cache[event]
-                continue
+                delete cache[event];
+                continue;
             }
 
             for (i = list.length - 2; i >= 0; i -= 2) {
                 if (!(callback && list[i] !== callback ||
                         context && list[i + 1] !== context)) {
-                    list.splice(i, 2)
+                    list.splice(i, 2);
                 }
             }
         }
 
-        return this
-    }
+        return this;
+    };
 
     Events.prototype.emit = function(events) {
-        var cache, event, all, list, i, len, rest = [], args
-        if (!(cache = this.__events)) return this
+        var cache, event, all, list, i, len, rest = [], args;
+        if (!(cache = this.__events)) {return this;}
 
-        events = events.split(eventSplitter)
+        events = events.split(eventSplitter);
 
         for (i = 1, len = arguments.length; i < len; i++) {
-            rest[i - 1] = arguments[i]
+            rest[i - 1] = arguments[i];
         }
 
         while (event = events.shift()) {
-            if (all = cache.all) all = all.slice()
-            if (list = cache[event]) list = list.slice()
+            if (all = cache.all){ all = all.slice();}
+            if (list = cache[event]) {list = list.slice();}
 
             if (list) {
                 for (i = 0, len = list.length; i < len; i += 2) {
-                    list[i].apply(list[i + 1] || this, rest)
+                    list[i].apply(list[i + 1] || this, rest);
                 }
             }
 
             if (all) {
-                args = [event].concat(rest)
+                args = [event].concat(rest);
                 for (i = 0, len = all.length; i < len; i += 2) {
-                    all[i].apply(all[i + 1] || this, args)
+                    all[i].apply(all[i + 1] || this, args);
                 }
             }
         }
 
-        return this
-    }
+        return this;
+    };
 
     Events.mixTo = function(receiver) {
-        receiver = receiver.prototype || receiver
-        var proto = Events.prototype
+        receiver = receiver.prototype || receiver;
+        var proto = Events.prototype;
 
         for (var p in proto) {
             if (proto.hasOwnProperty(p)) {
-                receiver[p] = proto[p]
+                receiver[p] = proto[p];
             }
         }
-    }
+    };
 
     // Speech instance ========================================================
 
@@ -109,97 +109,97 @@ Speech = (function (undefined) {
             interimResults: false,
             autoRestart: false,
             actions: {
-            	'next' : 'gotoNextClip',
-            	'pause': 'pauseClip',
-            	'polls': 'pauseClip',
-            	'porn': 'pauseClip',
-            	'paul': 'pauseClip',
-            	'repeat':'repeatClip',
-            	'show me': 'showExpandedContent' 
+                'next' : 'gotoNextClip',
+                'pause': 'pauseClip',
+                'polls': 'pauseClip',
+                'porn': 'pauseClip',
+                'paul': 'pauseClip',
+                'repeat':'repeatClip',
+                'show me': 'showExpandedContent'
             }
-        }
+        };
 
         // merge user options
         if (Object.prototype.toString.call(options) === '[object Object]') {
             for (var op in options) {
-                this.options[op] = options[op]
+                this.options[op] = options[op];
             }
         }
 
-        this.active         = false
-        this.manualStopped  = false
-        this.history        = []
-        this.lastIndex      = -1
-        this.lastResult     = ''
-        this.recognition    = new webkitSpeechRecognition()
+        this.active         = false;
+        this.manualStopped  = false;
+        this.history        = [];
+        this.lastIndex      = -1;
+        this.lastResult     = '';
+        this.recognition    = new webkitSpeechRecognition();
 
         var rec = this.recognition,
-            self = this
+            self = this;
 
-        rec.continuous = self.options.continuous
-        rec.interimResults = self.options.interimResults
-        if (options.lang) rec.lang = options.lang
+        rec.continuous = self.options.continuous;
+        rec.interimResults = self.options.interimResults;
+        if (options.lang) rec.lang = options.lang;
 
         rec.onstart = function () {
-            self.active = true
-            this.manualStopped = false
-            self.emit('start')
-        }
+            self.active = true;
+            this.manualStopped = false;
+            self.emit('start');
+        };
 
         rec.onresult = function (e) {
-            if (!e.results || !e.results.length) return
+            if (!e.results || !e.results.length) {return;}
 
             var updatedResult = e.results[e.resultIndex],
-                transcript = updatedResult[0].transcript.replace(/^\s*/, '')
+                transcript = updatedResult[0].transcript.replace(/^\s*/, '');
 
             // new sentence?
             if (e.resultIndex !== self.lastIndex) {
-                self.lastIndex = e.resultIndex
-                self.lastResult = ''
+                self.lastIndex = e.resultIndex;
+                self.lastResult = '';
             }
 
             // avoid some redundancy
-            if (transcript === self.lastResult && !updatedResult.isFinal) return
-            if (transcript.length < self.lastResult.length) return
+            if (transcript === self.lastResult && !updatedResult.isFinal) {return;}
+            if (transcript.length < self.lastResult.length) {return;}
 
-            self.lastResult = transcript
-        	
+            self.lastResult = transcript;
+            
             if (updatedResult.isFinal || self.action) {
                 // final sentence! we can do work!
-                self.history.push(transcript)
-                self.emit('finalResult', transcript)
+                self.history.push(transcript);
+                self.emit('finalResult', transcript);
 
             } else {
                 // interim, let's update stuff on screen
-                self.emit('interimResult', transcript)
+                self.emit('interimResult', transcript);
             }
             
             if (self.options.debugging) {
-                console.log(transcript + (updatedResult.isFinal ? ' (final)' : ''))
+                console.log(transcript + (updatedResult.isFinal ? ' (final)' : ''));
             }
-        }
+        };
 
         rec.onerror = function (e) {
-            self.emit('error', e)
-        }
+            self.emit('error', e);
+        };
 
         rec.onend = function () {
-            self.active = false
-            self.history    = []
-            self.lastIndex  = -1
-            self.lastResult = ''
-            self.emit('end')
+            self.active = false;
+            self.history    = [];
+            self.lastIndex  = -1;
+            self.lastResult = '';
+            self.emit('end');
             if (self.options.autoRestart && !self.manualStopped) {
-                self.start()
+                self.start();
             }
-        }
+        };
 
     }
 
     Speech.prototype.start = function () {
         if (this.active) {return;}
-        this.recognition.start()
-    }
+        this.recognition.start();
+    };
 
     Speech.prototype.stop = function () {
         if (!this.active) {return;}
@@ -210,24 +210,23 @@ Speech = (function (undefined) {
     
 
     Speech.prototype.testForAction = function(){
-    	var self = this;
-    	this.action = false;
-    	_(this.options.actions).each(function(test, key){
-    		if(self.lastResult.match(new RegExp(key,'i'))){
-    			$(document)
-	    		alert(test);this.action = test;
-	    		return false;
-    		}	
-    	});
+        var self = this;
+        this.action = false;
+        _(this.options.actions).each(function(test, key){
+            if(self.lastResult.match(new RegExp(key,'i'))){
+                $(document).trigger(test);
+                return false;
+            }
+        });
 
-    	
-    }
+        
+    };
 
-    Events.mixTo(Speech)
+    Events.mixTo(Speech);
 
-    return Speech
+    return Speech;
 
-})()
+})();
 
-	return Speech;
+    return Speech;
 });

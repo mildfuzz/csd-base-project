@@ -18,6 +18,5 @@ require(['app'],function(App){
     //initialise application
     
 
-    App.init();
-    App.startSpeech();
+    window.App = new App();
 });

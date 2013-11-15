@@ -1,13 +1,33 @@
 /*
  * Author: john.farrow@aerian.com
  */
-define(['libs/underscore','libs/jquery', 'libs/backbone','libs/speech'],function(_,$,Backbone,Speech){
-    var App = {};
-    App.init = function(){
-    	
+define(['libs/underscore','libs/jquery', 'libs/backbone','libs/speech','VideoPlayer'],function(_,$,Backbone,Speech, VideoPlayer){
+    var App = function(){
+        this.init();
+    }, a = App.prototype;
+    a.init = function(){
+        var video = new VideoPlayer({
+            id: 'my_video'
+        });
+        
+        
+        /**
+         * EVENT HANDLERS
+         */
+        
+        
     };
-    App.startSpeech = function(){
-			var text = $('.text');
+    a.attachVideo = function(){
+        this.video = new VideoPlayer({
+            id: 'my_video'
+        });
+
+        
+    };
+
+    
+    a.startSpeech = function(){
+            var text = $('.text');
 
             var speech = new Speech({
                 debugging: true,
@@ -28,7 +48,7 @@ define(['libs/underscore','libs/jquery', 'libs/backbone','libs/speech'],function
                     this.testForAction();
                     $(text).html(msg);
                 })
-                .start()
+                .start();
 
     };
 
